@@ -11,16 +11,16 @@ export async function load() {
       names: names,
     }
   } catch (error) {
-      console.log(
-        'Table does not exist, creating and seeding it with dummy data now...'
-      )
-      // Table is not created yet
-      await seed()
-      const { rows: names } = await db.query('SELECT * FROM names')
-      return {
-        names: names
-      }
-    } 
+    console.log(
+      'Table does not exist, creating and seeding it with dummy data now...'
+    )
+    // Table is not created yet
+    await seed()
+    const { rows: names } = await db.query('SELECT * FROM names')
+    return {
+      names: names
+    }
+  }
 }
 
 async function seed() {
@@ -63,22 +63,32 @@ async function seed() {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	
-  // update: async ({ request }) => {
-  //   const data = await request.formData();
-  //   const db = createPool({ connectionString: POSTGRES_URL })
-  //   const client = await db.connect();
 
-  //   const email = data.get('email');
-	// 	const name = data.get('name');
+  update: async ({ request }) => {
+    const data = await request.formData();
+    const db = createPool({ connectionString: POSTGRES_URL })
+    const client = await db.connect();
 
-  //   const updateUser = await client.sql`
-  //   UPDATE names
-  //   SET email = ${email}, name = ${name}
-  //   WHERE     ;`
-	
-	// 	return { success: true };
-	// },
+    const id = data.get('id');
+    const email = data.get('email');
+    const name = data.get('name');
+
+    if (name == '') {
+      const updateUser = await client.sql`
+      UPDATE names
+      SET email = ${email} Where id= ${id};`
+    } else if (email == '') {
+      const updateUser = await client.sql`
+      UPDATE names
+      SET name = ${name} Where id= ${id};`
+    } else {
+      const updateUser = await client.sql`
+      UPDATE names
+      SET name = ${name}, email=${email} Where id= ${id};`
+    }
+
+    return { success: true };
+  },
 
   delete: async ({ request }) => {
     const data = await request.formData();
@@ -90,17 +100,15 @@ export const actions = {
     const deleteUser = await client.sql`
     DELETE FROM names
     WHERE id = ${id};`
-	
-		return { success: true };
-	},
+  },
 
-	create: async ({request}) => {
-		const data = await request.formData();
+  create: async ({ request }) => {
+    const data = await request.formData();
     const db = createPool({ connectionString: POSTGRES_URL })
     const client = await db.connect();
 
     const email = data.get('email');
-		const name = data.get('name');
+    const name = data.get('name');
 
     const createUser = await client.sql`
       INSERT INTO names (name, email)
@@ -108,7 +116,7 @@ export const actions = {
       ON CONFLICT (email) DO NOTHING;
     `
     return { success: true };
-	}
+  }
 };
 
 
