@@ -1,9 +1,9 @@
 // import { error } from '@sveltejs/kit';
 import { createPool, sql } from '@vercel/postgres'
-import { POSTGRES_URL } from '$env/static/private'
+// import { POSTGRES_URL } from '$env/static/private'
 
 export async function load() {
-  const db = createPool({ connectionString: POSTGRES_URL })
+  const db = createPool({ connectionString: "postgres://default:LuevZdA1jNO2@ep-still-smoke-a197j3el-pooler.ap-southeast-1.aws.neon.tech/verceldb?sslmode=require" })
 
   try {
     const { rows: names } = await db.query('SELECT * FROM names')
